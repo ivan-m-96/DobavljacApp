@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './App.css';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import { removeDobavljac } from './service/api';
+import { removeDobavljac, updateDobavljac } from './service/api';
 import Header from './header';
 import Forma from './form';
 import Tabela from './table';
@@ -11,9 +11,15 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedRow: null
+      selectedRow: null,
+
+      naziv: '',
+      adresa: ''
     };
     this.onRemove = this.onRemove.bind(this);
+    this.setSelectedValues = this.setSelectedValues.bind(this);
+    this.handleTextChange = this.handleTextChange.bind(this);
+    this.onUpdate = this.onUpdate.bind(this);
   }
   async onRemove() {
     try {
@@ -29,6 +35,25 @@ class App extends React.Component {
     }
   }
 
+  async onUpdate() {
+    try {
+      await updateDobavljac(
+        this.state.selectedRow,
+        this.state.naziv,
+        this.state.adresa
+      ).then(r => {
+        console.log(r);
+      });
+    } catch (error) {}
+  }
+
+  setSelectedValues(naziv, adresa) {
+    this.setState({ naziv: naziv, adresa: adresa });
+  }
+
+  handleTextChange(e) {
+    this.setState({ [e.target.name]: e.target.value });
+  }
   setSelectedRow = id => this.setState({ selectedRow: id });
   render() {
     return (
@@ -54,6 +79,12 @@ class App extends React.Component {
                     selectedRow={this.state.selectedRow}
                     setSelectedRow={this.setSelectedRow}
                     onRemove={this.onRemove}
+                    onUpdate={this.onUpdate}
+                    lastSelectedRow={this.state.lastSelectedRow}
+                    setSelectedValues={this.setSelectedValues}
+                    naziv={this.state.naziv}
+                    adresa={this.state.adresa}
+                    handleTextChange={this.handleTextChange}
                   />
                 )}
               />

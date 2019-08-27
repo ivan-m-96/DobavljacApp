@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import './App.css';
 import getAllDobavljac from './service/api';
 
@@ -8,8 +12,11 @@ export class table extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dobavljaci: []
+      dobavljaci: [],
+      edit: false
     };
+    this.handleClick = this.handleClick.bind(this);
+    this.handleTextChange = this.handleTextChange.bind(this);
   }
 
   async getDobavljaci() {
@@ -26,11 +33,12 @@ export class table extends Component {
       console.log(e.message);
     }
   }
-
+  handleClick() {
+    this.setState(this.props.lastSelectedRow);
+  }
   async onRemove(e) {
-    console.log('klikno dugme');
     this.setSelectedRow(null);
-    await this.props.onRemove();
+    await this.props.onRemove().then();
   }
   componentWillReceiveProps({ someProp }) {
     this.setState({ ...this.state, someProp });
@@ -39,52 +47,109 @@ export class table extends Component {
     if (this.props.selectedRow === id) this.props.setSelectedRow(null);
     else this.props.setSelectedRow(id);
   }
+  setSelectedValues(naziv, adresa) {
+    this.props.setSelectedValues(naziv, adresa);
+  }
 
   async componentDidMount() {
     await this.getDobavljaci();
   }
-
+  async onUpdate() {
+    await this.props.onUpdate();
+  }
+  handleTextChange(e) {
+    this.props.handleTextChange(e);
+  }
   render() {
     return (
-      <Table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Naziv</th>
-            <th>Adresa</th>
-          </tr>
-        </thead>
-        <tbody>
-          {this.state.dobavljaci.map(dobavljac => (
-            <tr
-              key={dobavljac.id}
-              className="table-row"
-              style={
-                this.props.selectedRow === dobavljac.id
-                  ? { backgroundColor: '#D3D3D3	' }
-                  : {}
-              }
-              onClick={() => this.setSelectedRow(dobavljac.id)}
-            >
-              <td>{dobavljac.id}</td>
-              <td>{dobavljac.naziv}</td>
-              <td>{dobavljac.adresa}</td>
-              <td>
-                <Button
-                  id={dobavljac.id}
-                  variant="danger"
-                  disabled={this.props.selectedRow === null}
+      <div>
+        <div className="row justify-content-center" id="izmena-dobavljaca">
+          <Form.Row>
+            <Form.Label />
+
+            <Col>
+              <Form.Control
+                id="naziv"
+                name="naziv"
+                value={this.props.naziv}
+                placeholder="Naziv"
+                onChange={this.handleTextChange}
+              />
+            </Col>
+            <Col>
+              <Form.Control
+                id="adresa"
+                name="adresa"
+                value={this.props.adresa}
+                placeholder="Adresa"
+                onChange={this.handleTextChange}
+              />
+            </Col>
+            <Col>
+              <Button
+                variant="secondary"
+                disabled={!this.props.selectedRow}
+                onClick={async e => {
+                  await this.onUpdate();
+                  await this.getDobavljaci();
+                }}
+              >
+                {' '}
+                Izmena
+              </Button>
+            </Col>
+          </Form.Row>
+        </div>
+        <div className="row justify-content-center">
+          <Table className="table-hover" responsive>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Naziv</th>
+                <th>Adresa</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.dobavljaci.map(dobavljac => (
+                <tr
+                  key={dobavljac.id}
+                  className="table-row"
+                  style={
+                    this.props.selectedRow === dobavljac.id
+                      ? { backgroundColor: '#D3D3D3	' }
+                      : {}
+                  }
                   onClick={() => {
-                    this.onRemove();
+                    this.setSelectedRow(dobavljac.id);
+                    this.setSelectedValues(dobavljac.naziv, dobavljac.adresa);
                   }}
                 >
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+                  <td>{dobavljac.id}</td>
+                  <td>{dobavljac.naziv}</td>
+                  <td>{dobavljac.adresa}</td>
+
+                  <td>
+                    <ButtonGroup>
+                      <Button
+                        id={dobavljac.id}
+                        variant="danger"
+                        disabled={this.props.selectedRow !== dobavljac.id}
+                        onClick={async e => {
+                          await this.onRemove(e);
+                          await this.getDobavljaci();
+                        }}
+                      >
+                        Brisanje
+                      </Button>
+                    </ButtonGroup>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+      </div>
     );
   }
 }

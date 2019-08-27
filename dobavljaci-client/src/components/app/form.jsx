@@ -60,7 +60,7 @@ export default class form extends Component {
               console.log(result);
             }}
           >
-            Button
+            Add
           </Button>
         </Form>
       </div>

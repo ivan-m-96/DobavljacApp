@@ -12,12 +12,16 @@ import './header-css.css';
 export default function header() {
   return (
     <Navbar bg="light" expand="lg">
-      <Navbar.Brand href="/form">Upravljanje dobavljačima</Navbar.Brand>
+      <Navbar.Brand>Upravljanje dobavljačima</Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
-          <Nav.Link href="/form">Unos</Nav.Link>
-          <Nav.Link href="/tabela">Pregled i izmena</Nav.Link>
+          <Link className="nav-link" to="/form">
+            Unos
+          </Link>
+          <Link className="nav-link" to="/tabela">
+            Pregled i izmena
+          </Link>
         </Nav>
       </Navbar.Collapse>
     </Navbar>

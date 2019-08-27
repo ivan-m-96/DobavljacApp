@@ -66,4 +66,15 @@ export async function removeDobavljac(id) {
   return responsee;
 }
 
+export async function updateDobavljac(id, naziv, adresa) {
+  let responsee = null;
+  await axios
+    .patch('http://localhost:3001/dobavljaci/' + id, { naziv, adresa })
+    .then(response => (responsee = response))
+    .catch(e => {
+      console.log(e.message);
+    });
+  return responsee;
+}
+
 export default getAllDobavljac;
