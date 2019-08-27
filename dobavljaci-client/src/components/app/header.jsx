@@ -22,6 +22,9 @@ export default function header() {
           <Link className="nav-link" to="/tabela">
             Pregled i izmena
           </Link>
+          <Link className="nav-link" to="/porudzbenica">
+            Obrada porudzbenice
+          </Link>
         </Nav>
       </Navbar.Collapse>
     </Navbar>

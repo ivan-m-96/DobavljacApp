@@ -1,11 +1,14 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { ReactDOM, render } from 'react-dom';
 import './App.css';
+import 'react-widgets/dist/css/react-widgets.css';
+
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import { removeDobavljac, updateDobavljac } from './service/api';
 import Header from './header';
 import Forma from './form';
 import Tabela from './table';
+import ObradaPorudzbenice from './obradaPorudzbenice';
 
 class App extends React.Component {
   constructor(props) {
@@ -88,6 +91,10 @@ class App extends React.Component {
                   />
                 )}
               />
+              <Route
+                path="/porudzbenica"
+                render={props => <ObradaPorudzbenice {...props} />}
+              ></Route>
             </div>
           </div>
         </div>
