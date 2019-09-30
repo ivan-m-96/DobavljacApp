@@ -182,7 +182,7 @@ export default class obradaPorudzbenice extends Component {
                   ></Form.Control>
                 </Col>
                 <Col>
-                  <Form.Label>Količina</Form.Label>
+                  <Form.Label>Datum</Form.Label>
                   <InputGroup>
                     <Form.Control
                       type="text"

@@ -1,8 +1,9 @@
 import React from 'react';
+// eslint-disable-next-line
 import { ReactDOM, render } from 'react-dom';
 import './App.css';
 import 'react-widgets/dist/css/react-widgets.css';
-
+// eslint-disable-next-line
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import {
   removeDobavljac,
@@ -77,8 +78,10 @@ class App extends React.Component {
       }
     );
     let id = [...porudzbenice].pop();
-    console.log(id.id);
-    this.setState({ redniBrojPorudzbenice: id.id + 1 });
+    if (id) {
+      console.log(id.id);
+      this.setState({ redniBrojPorudzbenice: id.id + 1 });
+    } else this.setState({ redniBrojPorudzbenice: 1 });
   }
 
   setSelectedDobavljac(id) {

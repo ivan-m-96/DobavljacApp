@@ -1,5 +1,3 @@
-import { func } from 'prop-types';
-
 const axios = require('axios');
 
 export async function postDobavljac(dobavljac) {
