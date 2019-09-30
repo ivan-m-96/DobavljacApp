@@ -4,7 +4,11 @@ import './App.css';
 import 'react-widgets/dist/css/react-widgets.css';
 
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import { removeDobavljac, updateDobavljac } from './service/api';
+import {
+  removeDobavljac,
+  updateDobavljac,
+  getPorudzbeniceZaDobavljaca
+} from './service/api';
 import Header from './header';
 import Forma from './form';
 import Tabela from './table';
@@ -17,12 +21,16 @@ class App extends React.Component {
       selectedRow: null,
 
       naziv: '',
-      adresa: ''
+      adresa: '',
+      selectedDobavljac: 0,
+      redniBrojPorudzbenice: 0
     };
     this.onRemove = this.onRemove.bind(this);
     this.setSelectedValues = this.setSelectedValues.bind(this);
     this.handleTextChange = this.handleTextChange.bind(this);
     this.onUpdate = this.onUpdate.bind(this);
+    this.setSelectedDobavljac = this.setSelectedDobavljac.bind(this);
+    this.getRedniBrojPorudzbenice = this.getRedniBrojPorudzbenice.bind(this);
   }
   async onRemove() {
     try {
@@ -57,6 +65,27 @@ class App extends React.Component {
   handleTextChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
+
+  async getRedniBrojPorudzbenice() {
+    let porudzbenice = [];
+    await getPorudzbeniceZaDobavljaca(this.state.selectedDobavljac.id).then(
+      result => {
+        console.log('resultat' + result);
+        result.forEach(element => {
+          porudzbenice.push(element);
+        });
+      }
+    );
+    let id = [...porudzbenice].pop();
+    console.log(id.id);
+    this.setState({ redniBrojPorudzbenice: id.id + 1 });
+  }
+
+  setSelectedDobavljac(id) {
+    this.setState({ selectedDobavljac: id });
+    this.getRedniBrojPorudzbenice(id);
+  }
+
   setSelectedRow = id => this.setState({ selectedRow: id });
   render() {
     return (
@@ -93,7 +122,14 @@ class App extends React.Component {
               />
               <Route
                 path="/porudzbenica"
-                render={props => <ObradaPorudzbenice {...props} />}
+                render={props => (
+                  <ObradaPorudzbenice
+                    {...props}
+                    getRedniBrojPorudzbenice={this.getRedniBrojPorudzbenice}
+                    setSelectedDobavljac={this.setSelectedDobavljac}
+                    redniBrojPorudzbenice={this.state.redniBrojPorudzbenice}
+                  />
+                )}
               ></Route>
             </div>
           </div>

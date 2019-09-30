@@ -5,7 +5,12 @@ import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import InputGroup from 'react-bootstrap/InputGroup';
-import getAllDobavljac from './service/api';
+import {
+  getAllDobavljac,
+  getAllKatalog,
+  getKataloziZaDobavljaca
+} from './service/api';
+
 import 'react-widgets/dist/css/react-widgets.css';
 import './obradaPorudzbenice.css';
 
@@ -13,11 +18,13 @@ export default class obradaPorudzbenice extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      kolicina: null,
+      kolicina: 0,
       dobavljaci: [],
-      selectedDobavljac: null,
-      selectedKatalog: null,
-      selectedProizvod: null
+      katalozi: [],
+      proizvodi: [],
+      selectedDobavljac: '',
+      selectedKatalog: '',
+      selectedProizvod: ''
     };
 
     this.handleKolicinaChange = this.handleKolicinaChange.bind(this);
@@ -26,7 +33,7 @@ export default class obradaPorudzbenice extends Component {
   }
 
   handleKolicinaChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
+    this.setState({ kolicina: e.target.value });
   }
   handleSelect(e, name) {
     console.log(e);
@@ -52,6 +59,46 @@ export default class obradaPorudzbenice extends Component {
       console.log(e.message);
     }
   }
+  async getProizvodi() {
+    try {
+      let proizvodi = [];
+      await getAllKatalog(this.state.selectedKatalog).then(result => {
+        console.log(result);
+        result.stavke.forEach(element => {
+          proizvodi.push(element);
+        });
+      });
+
+      this.setState({ proizvodi: proizvodi });
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+  async getKatalozi() {
+    try {
+      let katalozi = [];
+      if (this.state.selectedDobavljac) {
+        await getKataloziZaDobavljaca(this.state.selectedDobavljac.id).then(
+          result => {
+            console.log(result);
+            katalozi = result.map(katalog => katalog.id);
+          }
+        );
+        this.setState({ katalozi });
+      }
+      if (!katalozi) {
+        console.log(
+          'za dobavljaca sa id ' +
+            this.state.selectedDobavljac.id +
+            'nema kataloga'
+        );
+      }
+      return katalozi;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   render() {
     return (
       <div>
@@ -67,7 +114,13 @@ export default class obradaPorudzbenice extends Component {
                     data={this.state.dobavljaci}
                     textField="naziv"
                     filter="contains"
-                    onSelect={e => this.handleSelect(e, 'selectedDobavljac')}
+                    onSelect={async e => {
+                      await this.handleSelect(e, 'selectedDobavljac');
+                      await this.getKatalozi();
+                      await this.props.setSelectedDobavljac(
+                        this.state.selectedDobavljac
+                      );
+                    }}
                   ></Combobox>
                 </Col>
                 <Col>
@@ -75,8 +128,13 @@ export default class obradaPorudzbenice extends Component {
 
                   <Combobox
                     id="katalozi"
+                    data={this.state.katalozi}
+                    textField="naziv"
                     disabled={!this.state.selectedDobavljac}
-                    onSelect={e => this.handleSelect(e, 'selectedKatalog')}
+                    onSelect={async e => {
+                      await this.handleSelect(e, 'selectedKatalog');
+                      await this.getProizvodi();
+                    }}
                   ></Combobox>
                 </Col>
               </Row>
@@ -86,6 +144,8 @@ export default class obradaPorudzbenice extends Component {
 
                   <Combobox
                     id="proizvodi"
+                    data={this.state.proizvodi}
+                    textField="naziv"
                     disabled={!this.state.selectedKatalog}
                     onSelect={e => this.handleSelect(e, 'selectedProizvod')}
                   ></Combobox>
@@ -106,6 +166,31 @@ export default class obradaPorudzbenice extends Component {
                         Unesi
                       </Button>
                     </InputGroup.Append>
+                  </InputGroup>
+                </Col>
+              </Row>
+            </Form.Group>
+            <Form.Group>
+              <Row>
+                <Col>
+                  <Form.Label>Redni broj porudžbenice</Form.Label>
+
+                  <Form.Control
+                    type="text"
+                    disabled={true}
+                    value={this.props.redniBrojPorudzbenice}
+                  ></Form.Control>
+                </Col>
+                <Col>
+                  <Form.Label>Količina</Form.Label>
+                  <InputGroup>
+                    <Form.Control
+                      type="text"
+                      placeholder="Datum"
+                      disabled={true}
+                      value={this.props.datum}
+                      name="date"
+                    />
                   </InputGroup>
                 </Col>
               </Row>

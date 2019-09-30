@@ -2,6 +2,8 @@ import { Router, Request, Response } from 'express';
 import * as bodyParser from 'body-parser';
 import { createConnection, getRepository } from 'typeorm';
 import { Dobavljac } from '../entity/Dobavljac';
+import { Katalog } from '../entity/Katalog';
+import { Porudzbenica } from '../entity/Porudzbenica';
 
 const app = Router();
 
@@ -26,7 +28,34 @@ app.get('/:id', async function (req: Request, res: Response) {
     res.json({ error: e.message });
   }
 });
-
+app.get('/:id/katalozi', async function (req: Request, res: Response) {
+  try {
+    const dobavljac = await getRepository(Katalog)
+      .createQueryBuilder("katalog").where('katalog.dobavljacId = :id', { id: req.params.id })
+      .getMany();
+    if (dobavljac) {
+      res.json(dobavljac);
+    } else {
+      res.json({ error: `Dobavljac id ${req.params.id} ne postoji.` });
+    }
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
+app.get('/:id/porudzbenice', async function (req: Request, res: Response) {
+  try {
+    const porudzbenica = await getRepository(Porudzbenica)
+      .createQueryBuilder("porudzbenica").where('porudzbenica.dobavljacId = :id', { id: req.params.id })
+      .getMany();
+    if (porudzbenica) {
+      res.json(porudzbenica);
+    } else {
+      res.json({ error: `Dobavljac id ${req.params.id} ne postoji.` });
+    }
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
 app.post('/', async function (req: Request, res: Response) {
   try {
     const dobavljacJson = JSON.parse(JSON.stringify(req.body));

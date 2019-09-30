@@ -3,6 +3,8 @@ import { createConnection } from 'typeorm';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import DobavljaciRoutesKontroler from './routes/DobavljacRoutesKontroler';
+import KataloziRoutesKontroler from './routes/KataloziRoutesKontroler';
+import PorudzbeniceRoutesKontroler from './routes/PorudzbeniceRoutesKontroler'
 var cors = require('cors');
 
 createConnection()
@@ -16,7 +18,8 @@ createConnection()
 
     // add routers
     app.use('/dobavljaci', DobavljaciRoutesKontroler);
-
+    app.use('/katalozi', KataloziRoutesKontroler);
+    app.use('/porudzbenice', PorudzbeniceRoutesKontroler)
     // start express server
     app.listen(3001, () => console.log('Listening on 3001...'));
   })
