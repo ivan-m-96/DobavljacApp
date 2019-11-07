@@ -275,6 +275,7 @@ export default class obradaPorudzbenice extends Component {
         redniBrojPorudzbenice: this.props.redniBrojPorudzbenice
       });
       this.setState({ izmenaPorudzbenice: true });
+      this.setState({insertMessage: ''})
     }
   }
 
@@ -330,14 +331,16 @@ export default class obradaPorudzbenice extends Component {
                     <Combobox
                       id="porudzbenice"
                       data={this.state.porudzbenice}
-                      textField={item =>
-                        typeof item === 'string'
+                      textField={item => {
+
+                        if(this.state.selectedDobavljacZaPorudzbenice) {
+                        return typeof item === 'string'
                           ? item
                           : 'ID: ' +
                             item.id +
                             ' ' +
-                            new Date(item.datum).toLocaleDateString()
-                      }
+                            new Date(item.datum).toLocaleDateString()}
+                      }}
                       filter="contains"
                       onSelect={async e => {
                         this.handleSelect(e, 'selectedPorudzbenica');
