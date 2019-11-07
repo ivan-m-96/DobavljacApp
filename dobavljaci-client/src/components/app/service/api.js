@@ -1,3 +1,5 @@
+import { func } from 'prop-types';
+
 const axios = require('axios');
 
 export async function postDobavljac(dobavljac) {
@@ -72,6 +74,7 @@ export async function updateDobavljac(id, naziv, adresa) {
     .catch(e => {
       console.log(e.message);
     });
+
   return responsee;
 }
 
@@ -124,6 +127,60 @@ export async function getPorudzbeniceZaDobavljaca(id) {
       return;
     });
   return resp;
+}
+
+export async function getPorudzbenica(id) {
+  let response = null;
+  await axios({
+    method: 'get',
+    url: 'http://localhost:3001/porudzbenice/' + id
+  })
+    .then(resp => {
+      response = resp;
+    })
+    .catch(err => console.log(err));
+  return response;
+}
+
+export async function postPorudzbenica(porudzbenica) {
+  let responsee = null;
+  await axios({
+    method: 'post',
+    url: 'http://localhost:3001/porudzbenice',
+    data: {
+      porudzbenica
+    }
+  }).then(function(response) {
+    console.log(response);
+    responsee = response;
+    if (response.status === 200) {
+      responsee = { ...responsee, message: 'Uspešno uneta porudžbenica!' };
+    }
+  });
+  return responsee;
+}
+
+export async function patchPorudzbenica(porudzbenica) {
+  let responsee = null;
+  await axios
+    .patch('http://localhost:3001/porudzbenice/' + porudzbenica.id, {
+      porudzbenica
+    })
+    .then(response => {
+      responsee = response;
+      if (response.status === 200) {
+        responsee = {
+          ...responsee,
+          message: 'Uspešno izmenjena porudžbenica!'
+        };
+      }
+    })
+    .catch(e => {
+      console.log('PATCH');
+      console.log(e.message);
+    });
+  console.log('PATCH done' + responsee);
+  return responsee;
 }
 
 export default getAllDobavljac;

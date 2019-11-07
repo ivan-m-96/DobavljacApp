@@ -12,16 +12,16 @@ export class Porudzbenica {
     @Column()
     datum: Date;
 
-    @OneToOne(type => Dobavljac, { primary: true })
+    @ManyToOne(type => Dobavljac, { primary: true, eager: true })
     @JoinColumn()
     dobavljac: Dobavljac;
 
 
-    @OneToOne(type => Prenociste, { primary: true })
+    @ManyToOne(type => Prenociste, { primary: true, eager: true })
     @JoinColumn()
     prenociste: Prenociste;
 
 
-    @OneToMany(type => StavkaPorudzbenice, stavkaPorudzbenice => stavkaPorudzbenice.porudzbenica)
+    @OneToMany(type => StavkaPorudzbenice, stavkaPorudzbenice => stavkaPorudzbenice.porudzbenica, { eager: true, onDelete: "CASCADE" })
     stavke: StavkaPorudzbenice[]
 }

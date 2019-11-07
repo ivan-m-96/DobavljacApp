@@ -15,18 +15,20 @@ import './header-css.css';
 export default function header() {
   return (
     <Navbar bg="light" expand="lg">
-      <Navbar.Brand>Upravljanje dobavljačima</Navbar.Brand>
+      <Navbar.Brand className="nav-link" to="/dobavljaci">
+        Upravljanje naručivanjem
+      </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
-          <Link className="nav-link" to="/form">
+          {/* <Link className="nav-link" to="/form">
             Unos
-          </Link>
-          <Link className="nav-link" to="/tabela">
-            Pregled i izmena
+          </Link> */}
+          <Link className="nav-link" to="/dobavljaci">
+            Obrada dobavljača
           </Link>
           <Link className="nav-link" to="/porudzbenica">
-            Obrada porudzbenice
+            Obrada porudžbenice
           </Link>
         </Nav>
       </Navbar.Collapse>

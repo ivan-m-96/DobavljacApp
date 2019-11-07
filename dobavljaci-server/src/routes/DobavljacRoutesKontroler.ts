@@ -45,7 +45,7 @@ app.get('/:id/katalozi', async function (req: Request, res: Response) {
 app.get('/:id/porudzbenice', async function (req: Request, res: Response) {
   try {
     const porudzbenica = await getRepository(Porudzbenica)
-      .createQueryBuilder("porudzbenica").where('porudzbenica.dobavljacId = :id', { id: req.params.id })
+      .createQueryBuilder("porudzbenica").leftJoinAndSelect("porudzbenica.dobavljac", "dobavljac").where('porudzbenica.dobavljacId = :id', { id: req.params.id })
       .getMany();
     if (porudzbenica) {
       res.json(porudzbenica);
@@ -58,7 +58,7 @@ app.get('/:id/porudzbenice', async function (req: Request, res: Response) {
 });
 app.post('/', async function (req: Request, res: Response) {
   try {
-    const dobavljacJson = JSON.parse(JSON.stringify(req.body));
+    const dobavljacJson = req.body;
     let result = null;
     if (dobavljacJson.naziv && dobavljacJson.adresa) {
       result = await getRepository(Dobavljac).insert({ ...dobavljacJson });

@@ -8,11 +8,12 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import {
   removeDobavljac,
   updateDobavljac,
-  getPorudzbeniceZaDobavljaca
+  getPorudzbeniceZaDobavljaca,
+  postDobavljac
 } from './service/api';
 import Header from './header';
 import Forma from './form';
-import Tabela from './table';
+import Tabela from './tableDobavljaci';
 import ObradaPorudzbenice from './obradaPorudzbenice';
 
 class App extends React.Component {
@@ -24,14 +25,18 @@ class App extends React.Component {
       naziv: '',
       adresa: '',
       selectedDobavljac: 0,
+      selectedPorudzbenica: null,
       redniBrojPorudzbenice: 0
     };
     this.onRemove = this.onRemove.bind(this);
     this.setSelectedValues = this.setSelectedValues.bind(this);
     this.handleTextChange = this.handleTextChange.bind(this);
     this.onUpdate = this.onUpdate.bind(this);
+    this.onInsert = this.onInsert.bind(this);
     this.setSelectedDobavljac = this.setSelectedDobavljac.bind(this);
     this.getRedniBrojPorudzbenice = this.getRedniBrojPorudzbenice.bind(this);
+    this.setSelectedPorudzbenica = this.setSelectedPorudzbenica.bind(this);
+    this.refresh = this.refresh.bind(this);
   }
   async onRemove() {
     try {
@@ -40,7 +45,7 @@ class App extends React.Component {
 
       let result = await removeDobavljac(id);
       console.log('poslato');
-      this.setState({ selectedRow: null });
+      this.setState({ selectedRow: null, naziv: '', adresa: '' });
       console.log(result);
     } catch (error) {
       console.log(error.message);
@@ -59,8 +64,23 @@ class App extends React.Component {
     } catch (error) {}
   }
 
+  async onInsert() {
+    try {
+      await postDobavljac({
+        naziv: this.state.naziv,
+        adresa: this.state.adresa
+      }).then(result => console.log(result));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   setSelectedValues(naziv, adresa) {
-    this.setState({ naziv: naziv, adresa: adresa });
+    if (this.state.selectedRow) {
+      this.setState({ naziv: naziv, adresa: adresa });
+    } else {
+      this.setState({ naziv: '', adresa: '' });
+    }
   }
 
   handleTextChange(e) {
@@ -68,28 +88,45 @@ class App extends React.Component {
   }
 
   async getRedniBrojPorudzbenice() {
-    let porudzbenice = [];
-    await getPorudzbeniceZaDobavljaca(this.state.selectedDobavljac.id).then(
-      result => {
-        console.log('resultat' + result);
-        result.forEach(element => {
-          porudzbenice.push(element);
-        });
-      }
-    );
-    let id = [...porudzbenice].pop();
-    if (id) {
-      console.log(id.id);
-      this.setState({ redniBrojPorudzbenice: id.id + 1 });
-    } else this.setState({ redniBrojPorudzbenice: 1 });
+    if (!this.state.selectedPorudzbenica) {
+      let porudzbenice = [];
+      await getPorudzbeniceZaDobavljaca(this.state.selectedDobavljac.id).then(
+        result => {
+          console.log('resultat' + result);
+          result.forEach(element => {
+            porudzbenice.push(element);
+          });
+        }
+      );
+      let id = [...porudzbenice].pop();
+      if (id) {
+        console.log(
+          'redni broj porudzbenice iz getRedniBrojPorudzbenice()' + id.id
+        );
+        this.setState({ redniBrojPorudzbenice: id.id + 1 });
+      } else this.setState({ redniBrojPorudzbenice: 1 });
+    } else {
+      this.setState({
+        redniBrojPorudzbenice: this.state.selectedPorudzbenica.id
+      });
+    }
   }
 
   setSelectedDobavljac(id) {
     this.setState({ selectedDobavljac: id });
-    this.getRedniBrojPorudzbenice(id);
+    this.getRedniBrojPorudzbenice();
   }
 
+  setSelectedPorudzbenica(porudzbenica) {
+    this.setState({ selectedPorudzbenica: porudzbenica });
+    this.getRedniBrojPorudzbenice();
+  }
   setSelectedRow = id => this.setState({ selectedRow: id });
+
+  refresh() {
+    this.setState({ ...this.state });
+  }
+
   render() {
     return (
       <Router>
@@ -105,9 +142,9 @@ class App extends React.Component {
           <div>
             <hr />
             <div>
-              <Route path="/form" render={props => <Forma {...props} />} />
+              {/* <Route path="/form" render={props => <Forma {...props} />} /> */}
               <Route
-                path="/tabela"
+                path="/dobavljaci"
                 render={props => (
                   <Tabela
                     {...props}
@@ -115,11 +152,13 @@ class App extends React.Component {
                     setSelectedRow={this.setSelectedRow}
                     onRemove={this.onRemove}
                     onUpdate={this.onUpdate}
+                    onInsert={this.onInsert}
                     lastSelectedRow={this.state.lastSelectedRow}
                     setSelectedValues={this.setSelectedValues}
                     naziv={this.state.naziv}
                     adresa={this.state.adresa}
                     handleTextChange={this.handleTextChange}
+                    refresh={this.refresh}
                   />
                 )}
               />
@@ -131,6 +170,7 @@ class App extends React.Component {
                     getRedniBrojPorudzbenice={this.getRedniBrojPorudzbenice}
                     setSelectedDobavljac={this.setSelectedDobavljac}
                     redniBrojPorudzbenice={this.state.redniBrojPorudzbenice}
+                    setSelectedPorudzbenica={this.setSelectedPorudzbenica}
                   />
                 )}
               ></Route>

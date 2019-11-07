@@ -14,10 +14,10 @@ export class StavkaPorudzbenice {
     kolicina: Number;
 
 
-    @ManyToOne(type => Porudzbenica, porudzbenica => porudzbenica.stavke, { nullable: false, primary: true })
+    @ManyToOne(type => Porudzbenica, porudzbenica => porudzbenica.stavke, { nullable: false, primary: true, onDelete: "CASCADE" })
     porudzbenica: Porudzbenica
 
-    @OneToOne(type => StavkaKataloga, { nullable: false })
+    @ManyToOne(type => StavkaKataloga, { nullable: false, eager: true })
     @JoinColumn()
     stavkaKataloga: StavkaKataloga;
 }

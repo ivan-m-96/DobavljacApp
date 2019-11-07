@@ -20,7 +20,7 @@ app.get('/:id', async function (req: Request, res: Response) {
     try {
         const katalog = await getRepository(Katalog).findOne(req.params.id);
         const stavkeKataloga = await getRepository(StavkaKataloga)
-            .createQueryBuilder("stavka")
+            .createQueryBuilder("stavka").leftJoinAndSelect("stavka.proizvod", "proizvod")
             .where("stavka.katalogId = :id", { id: req.params.id }).getMany();
         katalog.stavke = stavkeKataloga;
         res.json(katalog);

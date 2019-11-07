@@ -1,2 +1,45 @@
-#unos {
+.error {
+  color: red;
+}
+.obradaPorudzbenice {
+  padding: 1%, 5%;
+}
+
+.porud {
+  display: flex;
+  align-self: center;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+}
+
+.prikazPorudzbenice {
+  border-style: groove;
+  border-width: 1.5px;
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+  align-content: center;
+
+  padding: 1%;
+}
+
+.unosPorudzbenice {
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+  align-content: center;
+}
+
+.inputKolicina {
+  border-style: groove;
+  border-width: 1.5px;
+  padding: 1%;
+}
+
+.porudzbenicaTabela {
+  border-style: groove;
+  border-width: 1.5px;
+  padding: 1%;
+  margin-top: 1%;
 }

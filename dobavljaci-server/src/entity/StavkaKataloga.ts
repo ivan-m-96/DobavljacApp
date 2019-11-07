@@ -14,10 +14,10 @@ export class StavkaKataloga {
     @Column()
     naziv: String;
 
-    @ManyToOne(type => Katalog, katalog => katalog.stavke, { nullable: false, primary: true })
+    @ManyToOne(type => Katalog, katalog => katalog.stavke, { nullable: false, primary: true, eager: true })
     katalog: Katalog
 
-    @ManyToOne(type => Proizvod, { nullable: false })
+    @ManyToOne(type => Proizvod, { nullable: false, eager: true })
     @JoinColumn()
     proizvod: Proizvod;
 }
