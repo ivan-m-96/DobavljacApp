@@ -183,4 +183,21 @@ export async function patchPorudzbenica(porudzbenica) {
   return responsee;
 }
 
+export async function removePorudzbenica(porudzbenica) {
+  let responsee = null;
+  await axios
+    .delete('http://localhost:3001/porudzbenice/' + porudzbenica.id, {
+      porudzbenica
+    })
+    .then(function(response) {
+      console.log('stigo del');
+      console.log(response);
+      responsee = response;
+      return response;
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+  return responsee;
+}
 export default getAllDobavljac;

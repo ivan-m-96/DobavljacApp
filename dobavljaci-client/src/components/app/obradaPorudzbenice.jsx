@@ -14,7 +14,8 @@ import {
   postPorudzbenica,
   getPorudzbeniceZaDobavljaca,
   getPorudzbenica,
-  patchPorudzbenica
+  patchPorudzbenica,
+  removePorudzbenica
 } from './service/api';
 
 import 'react-widgets/dist/css/react-widgets.css';
@@ -43,6 +44,23 @@ export default class obradaPorudzbenice extends Component {
       errors: {}
     };
 
+    const startState = {
+      kolicina: 0,
+      katalozi: [],
+      proizvodi: [],
+      stavke: [],
+      porudzbenice: [],
+      curStavkaId: 1,
+      datum: new Date(),
+      izmenaPorudzbenice: false,
+      selectedDobavljac: '',
+      selectedKatalog: '',
+      selectedProizvod: '',
+      selectedDobavljacZaPorudzbenice: '',
+      selectedPorudzbenica: '',
+      insertMessage: '',
+      errors: {}
+    };
     /* REFERENCE DECLARATIONS */
 
     /* ---------------------- */
@@ -57,6 +75,11 @@ export default class obradaPorudzbenice extends Component {
       this
     );
     this.handleUnosNove = this.handleUnosNove.bind(this);
+    this.handleBrisanjePorudzbenice = this.handleBrisanjePorudzbenice.bind(
+      this
+    );
+    this.handleStavkaChange = this.handleStavkaChange.bind(this);
+    this.handleBrisanjeStavke = this.handleBrisanjeStavke.bind(this);
   }
 
   handleKolicinaChange(e) {
@@ -275,7 +298,7 @@ export default class obradaPorudzbenice extends Component {
         redniBrojPorudzbenice: this.props.redniBrojPorudzbenice
       });
       this.setState({ izmenaPorudzbenice: true });
-      this.setState({insertMessage: ''})
+      this.setState({ insertMessage: '' });
     }
   }
 
@@ -298,6 +321,67 @@ export default class obradaPorudzbenice extends Component {
       errors: {}
     });
     this.props.setSelectedPorudzbenica(this.state.selectedPorudzbenica);
+  }
+
+  async handleBrisanjePorudzbenice() {
+    await removePorudzbenica(this.state.selectedPorudzbenica);
+    await this.setState({
+      kolicina: 0,
+      katalozi: [],
+      proizvodi: [],
+      stavke: [],
+      porudzbenice: [],
+      curStavkaId: 1,
+      datum: new Date(),
+      izmenaPorudzbenice: false,
+      selectedDobavljac: '',
+      selectedKatalog: '',
+      selectedProizvod: '',
+      selectedDobavljacZaPorudzbenice: '',
+      selectedPorudzbenica: '',
+      insertMessage: '',
+      errors: {}
+    });
+    this.props.setSelectedPorudzbenica(null);
+  }
+
+  handleStavkaChange(e) {
+    console.log(e.target.id + ' ' + e.target.value);
+    e.target.value = e.target.value.replace(/\D/, '');
+    let proizvodi = [...this.state.stavke];
+    let stavke = [];
+    proizvodi.forEach(element => {
+      console.log(element);
+      console.log(typeof element.porId + ' ' + typeof e.target.value);
+
+      if (element.porId == e.target.id) {
+        console.log(element.porId + ' ' + e.target.id);
+        element.kolicina = e.target.value;
+
+        console.log(element);
+      }
+      stavke.push(element);
+    });
+
+    this.setState({ stavke: stavke });
+  }
+
+  handleBrisanjeStavke(e) {
+    let stavkaId = e.target.id;
+    let proizvodi = [...this.state.stavke];
+
+    console.log('stavkaId' + stavkaId);
+    proizvodi.forEach((element, index, proizvodi) => {
+      console.log(element);
+      if (element.porId == stavkaId) {
+        element = { ...element, zaBrisanje: true };
+        proizvodi[index] = element;
+        console.log('izmenjeni');
+        console.log(element);
+      }
+    });
+    console.log(proizvodi);
+    this.setState({ stavke: proizvodi });
   }
 
   render() {
@@ -332,14 +416,14 @@ export default class obradaPorudzbenice extends Component {
                       id="porudzbenice"
                       data={this.state.porudzbenice}
                       textField={item => {
-
-                        if(this.state.selectedDobavljacZaPorudzbenice) {
-                        return typeof item === 'string'
-                          ? item
-                          : 'ID: ' +
-                            item.id +
-                            ' ' +
-                            new Date(item.datum).toLocaleDateString()}
+                        if (this.state.selectedDobavljacZaPorudzbenice) {
+                          return typeof item === 'string'
+                            ? item
+                            : 'ID: ' +
+                                item.id +
+                                ' ' +
+                                new Date(item.datum).toLocaleDateString();
+                        }
                       }}
                       filter="contains"
                       onSelect={async e => {
@@ -479,7 +563,11 @@ export default class obradaPorudzbenice extends Component {
               </Row>
             </Form.Group>
           </Form>
-          <Tabela proizvodi={this.state.stavke}></Tabela>
+          <Tabela
+            proizvodi={this.state.stavke}
+            handleStavkaChange={this.handleStavkaChange}
+            handleBrisanjeStavke={this.handleBrisanjeStavke}
+          ></Tabela>
           <div>{this.state.insertMessage}</div>
           <div>
             <Button
@@ -497,6 +585,18 @@ export default class obradaPorudzbenice extends Component {
               data-toggle="popover"
             >
               Poništi
+            </Button>
+            <Button
+              id="brisanjePorudzbenice"
+              variant="danger"
+              onClick={this.handleBrisanjePorudzbenice}
+              data-toggle="popover"
+              disabled={
+                !this.state.selectedPorudzbenica &&
+                !this.state.izmenaPorudzbenice
+              }
+            >
+              Izbriši
             </Button>
           </div>
         </div>

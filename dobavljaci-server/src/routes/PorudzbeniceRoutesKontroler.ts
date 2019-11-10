@@ -97,8 +97,14 @@ app.patch("/:id", async function (req: Request, res: Response) {
                 let postojeca;
                 await manager.getRepository(StavkaPorudzbenice).findOne({ id: element.porId, porudzbenica: req.body.porudzbenica.id }).then(res => postojeca = res);
                 if (postojeca) {
-                    await manager.getRepository(StavkaPorudzbenice).update({ id: postojeca.id, porudzbenica: foundPorudzbenica.id }, { kolicina: element.kolicina }).then(res => response = { ...response, res });
-                    console.log('updated postojeca' + postojeca);
+                    if (element.zaBrisanje) {
+                        console.log('ELEMENT ZA BRISANJE');
+                        await manager.getRepository(StavkaPorudzbenice).delete({ id: postojeca.id, porudzbenica: foundPorudzbenica.id }).then(res => response = { ...response, res });
+                        console.log('deleted postojeca' + postojeca);
+                    } else {
+                        await manager.getRepository(StavkaPorudzbenice).update({ id: postojeca.id, porudzbenica: foundPorudzbenica.id }, { kolicina: element.kolicina }).then(res => response = { ...response, res });
+                        console.log('updated postojeca' + postojeca);
+                    }
                 } else {
                     let stavkaKataloga = await manager.findOne(StavkaKataloga, { id: element.id });
                     element.id = element.porId;
@@ -114,6 +120,22 @@ app.patch("/:id", async function (req: Request, res: Response) {
         res.json(response);
     })
 })
+
+app.delete('/:id', async function (req: Request, res: Response) {
+    try {
+        let reqPorudzbenica = req.body;
+        let porudzbenica = await getRepository(Porudzbenica).findOne(reqPorudzbenica);
+        if (porudzbenica) {
+            console.log('removing one ' + req.params.id);
+            await getRepository(Porudzbenica).delete(porudzbenica);
+            res.sendStatus(200);
+        } else {
+            res.json({ error: `Porudzbenica sa id = ${req.params.id} ne postoji.` });
+        }
+    } catch (error) {
+        res.json({ error: error.message });
+    }
+});
 
 
 export default app;

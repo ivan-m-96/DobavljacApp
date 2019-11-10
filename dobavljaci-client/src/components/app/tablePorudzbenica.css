@@ -1,3 +1,8 @@
 #obradaPorudzbenice {
   padding: 1%, 5%;
 }
+
+.kolicina {
+  text-align: center;
+  width: 100px;
+}

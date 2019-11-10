@@ -26,20 +26,49 @@ export class tablePorudzbenica extends Component {
                 <th>Jedinična cena</th>
                 <th>Količina</th>
                 <th>Ukupna cena</th>
-                <th />
+                <th>Izbriši?</th>
               </tr>
             </thead>
             <tbody>
-              {this.props.proizvodi.map(stavka => (
-                <tr key={stavka.porId}>
-                  <td>{stavka.porId}</td>
-                  <td>{stavka.proizvod.naziv}</td>
-                  <td>{stavka.proizvod.cena}</td>
-                  <td>{stavka.kolicina}</td>
-                  <td>{stavka.proizvod.cena * stavka.kolicina}</td>
-                  <th />
-                </tr>
-              ))}
+              {this.props.proizvodi.map(stavka => {
+                if (!stavka.zaBrisanje) {
+                  return (
+                    <tr key={stavka.porId}>
+                      <td>{stavka.porId}</td>
+                      <td>{stavka.proizvod.naziv}</td>
+                      <td>{stavka.proizvod.cena}</td>
+                      <td>
+                        <input
+                          className="kolicina"
+                          id={stavka.porId}
+                          type="text"
+                          pattern="[0-9]*"
+                          value={stavka.kolicina}
+                          onChange={this.props.handleStavkaChange}
+                        />
+                        {/* <input
+                      type=number
+                      id={stavka.porId}
+                      value={stavka.kolicina}
+                      onChange={this.props.handleStavkaChange}
+                    ></input> */}
+                      </td>
+                      <td>{stavka.proizvod.cena * stavka.kolicina}</td>
+                      <td>
+                        <Button
+                          id={stavka.porId}
+                          variant="danger"
+                          onClick={this.props.handleBrisanjeStavke}
+                          disabled={stavka.zaBrisanje === true}
+                        >
+                          Izbriši
+                        </Button>
+                      </td>
+                      <th />
+                    </tr>
+                  );
+                }
+              })}
             </tbody>
           </Table>
         </div>
