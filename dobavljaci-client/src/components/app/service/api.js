@@ -195,6 +195,12 @@ export async function removePorudzbenica(porudzbenica) {
       console.log('stigo del');
       console.log(response);
       responsee = response;
+      if (response.status === 200) {
+        responsee = {
+          ...responsee,
+          message: 'Uspešno izbrisana porudžbenica!'
+        };
+      }
       return response;
     })
     .catch(function(error) {

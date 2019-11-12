@@ -324,10 +324,11 @@ export default class obradaPorudzbenice extends Component {
   }
 
   async handleBrisanjePorudzbenice() {
-    await removePorudzbenica({
+    let result = await removePorudzbenica({
       ...this.state.selectedPorudzbenica,
       prenociste: { id: 1 }
     });
+
     await this.setState({
       kolicina: 0,
       katalozi: [],
@@ -342,7 +343,7 @@ export default class obradaPorudzbenice extends Component {
       selectedProizvod: '',
       selectedDobavljacZaPorudzbenice: '',
       selectedPorudzbenica: '',
-      insertMessage: '',
+      insertMessage: result.message,
       errors: {}
     });
     this.props.setSelectedPorudzbenica(null);
