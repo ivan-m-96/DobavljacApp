@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import * as bodyParser from 'body-parser';
-import { createConnection, getRepository, getManager, TransactionManager, getConnection, EntityManager } from 'typeorm';
+import { createConnection, getRepository, getManager, TransactionManager, getConnection, EntityManager, ChildEntity } from 'typeorm';
 import { Porudzbenica } from '../entity/Porudzbenica';
 import { StavkaPorudzbenice } from '../entity/StavkaPorudzbenice';
 import { StavkaKataloga } from '../entity/StavkaKataloga';
@@ -123,11 +123,19 @@ app.patch("/:id", async function (req: Request, res: Response) {
 
 app.delete('/:id', async function (req: Request, res: Response) {
     try {
-        let reqPorudzbenica = req.body;
-        let porudzbenica = await getRepository(Porudzbenica).findOne(reqPorudzbenica);
+        let porudzbenica = req.body.porudzbenica;
+        let foundPorudzbenica = {};
+
+
+        await getRepository(Porudzbenica).findOne({ id: porudzbenica.id, dobavljac: porudzbenica.dobavljac.id, prenociste: porudzbenica.prenociste.id }).then(res => foundPorudzbenica = res);
+
+        // let porudzbenica = await getRepository(Porudzbenica).findOne(reqPorudzbenica).catch(res => console.log(res));
+        console.log('porudzbenica iz baze');
+        console.log(foundPorudzbenica);
+
         if (porudzbenica) {
             console.log('removing one ' + req.params.id);
-            await getRepository(Porudzbenica).delete(porudzbenica);
+            // await getRepository(Porudzbenica).delete(foundPorudzbenica);
             res.sendStatus(200);
         } else {
             res.json({ error: `Porudzbenica sa id = ${req.params.id} ne postoji.` });

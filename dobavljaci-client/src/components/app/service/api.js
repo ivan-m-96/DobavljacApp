@@ -185,9 +185,11 @@ export async function patchPorudzbenica(porudzbenica) {
 
 export async function removePorudzbenica(porudzbenica) {
   let responsee = null;
+  console.log('porudzbenica iz zahteva');
+  console.log(porudzbenica);
   await axios
     .delete('http://localhost:3001/porudzbenice/' + porudzbenica.id, {
-      porudzbenica
+      data: { porudzbenica }
     })
     .then(function(response) {
       console.log('stigo del');
