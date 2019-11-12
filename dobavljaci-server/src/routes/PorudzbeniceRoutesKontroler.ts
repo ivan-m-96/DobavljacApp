@@ -135,7 +135,7 @@ app.delete('/:id', async function (req: Request, res: Response) {
 
         if (porudzbenica) {
             console.log('removing one ' + req.params.id);
-            // await getRepository(Porudzbenica).delete(foundPorudzbenica);
+            await getRepository(Porudzbenica).delete(foundPorudzbenica);
             res.sendStatus(200);
         } else {
             res.json({ error: `Porudzbenica sa id = ${req.params.id} ne postoji.` });
